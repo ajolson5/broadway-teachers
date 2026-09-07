@@ -77,7 +77,8 @@ h1,h2,h3{ font-family:'Archivo', system-ui, sans-serif; text-wrap:balance; font-
 .events{ display:flex; flex-direction:column; gap:.75rem; }
 .event{ display:grid; grid-template-columns:3.6rem 1fr; gap:.85rem; align-items:start; padding-bottom:.75rem; border-bottom:1px solid var(--line); }
 .event:last-child{ border-bottom:none; padding-bottom:0; }
-.event .date{ font-family:'IBM Plex Mono', monospace; text-align:center; background:var(--teal-soft); color:var(--teal); border-radius:6px; padding:.35rem .2rem; font-size:.72rem; line-height:1.2; }
+.event .date{ font-family:'IBM Plex Mono', monospace; text-align:center; background:var(--teal-soft); color:var(--teal); border-radius:6px; padding:.35rem .2rem; font-size:.72rem; line-height:1.2; border:none; width:100%; cursor:pointer; }
+.event .date:hover, .event .date:focus-visible{ filter:brightness(.94); }
 .event .date .dow{ display:block; letter-spacing:.06em; text-transform:uppercase; font-size:.62rem; opacity:.85;}
 .event .date .num{ display:block; font-size:1.15rem; font-weight:600; font-variant-numeric:tabular-nums; }
 .event .date.sunday-am{ background:var(--yellow-soft); color:var(--yellow-ink); }
@@ -365,10 +366,14 @@ function renderEvents(events){
     const timeStr = e.allDay ? 'All day' : fmtTime(e.startDate) + (e.endDate ? '–' + fmtTime(e.endDate) : '');
     const meta = [timeStr, e.description].filter(Boolean).join(' · ');
     const dateCls = 'date' + (classifyEvent(e) ? ' ' + classifyEvent(e) : '');
-    return '<div class="event"><div class="' + dateCls + '"><span class="dow">' + dow + '</span><span class="num">' + num +
-      '</span></div><div><div class="title">' + escapeHtml(e.summary) + '</div><div class="meta">' +
+    return '<div class="event"><button type="button" class="' + dateCls + '" data-event-id="' + escapeHtml(e.id) +
+      '" aria-label="View details for ' + escapeHtml(e.summary) + '"><span class="dow">' + dow + '</span><span class="num">' + num +
+      '</span></button><div><div class="title">' + escapeHtml(e.summary) + '</div><div class="meta">' +
       escapeHtml(meta) + '</div>' + locationLineHtml(e.location) + '</div></div>';
   }).join('');
+  container.querySelectorAll('button[data-event-id]').forEach(btn => {
+    btn.addEventListener('click', () => openDetailPopup(btn.getAttribute('data-event-id')));
+  });
 }
 
 let ALL_EVENTS = [];
