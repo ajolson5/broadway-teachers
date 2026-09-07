@@ -351,6 +351,7 @@ table.roster-edit input{ width:100%; }
     <div class="detail-popup-meta" id="detail-popup-meta"></div>
     <div class="detail-popup-location" id="detail-popup-location" hidden></div>
     <div class="detail-popup-map" id="detail-popup-map" hidden></div>
+    <div class="detail-popup-location" id="detail-popup-link" hidden></div>
     <div class="detail-popup-body" id="detail-popup-body"></div>
   </div>
 </div>
@@ -393,6 +394,12 @@ function locationLineHtml(location){
     ' <a href="' + mapsSearchUrl(location) + '" target="_blank" rel="noopener" class="maps-link">Open in Maps</a></div>';
 }
 
+function eventLinkLineHtml(url){
+  if (!url) return '';
+  return '<div class="location-line"><span class="loc-label">Link: </span>' +
+    '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" class="maps-link">Open link</a></div>';
+}
+
 function renderEvents(events){
   const now = new Date();
   const windowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -422,7 +429,7 @@ function renderEvents(events){
     return '<div class="event"><button type="button" class="' + dateCls + '" data-event-id="' + escapeHtml(e.id) +
       '" aria-label="View details for ' + escapeHtml(e.summary) + '"><span class="dow">' + dow + '</span><span class="num">' + num +
       '</span></button><div><div class="title">' + escapeHtml(e.summary) + '</div><div class="meta">' +
-      escapeHtml(meta) + '</div>' + locationLineHtml(e.location) + '</div></div>';
+      escapeHtml(meta) + '</div>' + locationLineHtml(e.location) + eventLinkLineHtml(e.url) + '</div></div>';
   }).join('');
   container.querySelectorAll('button[data-event-id]').forEach(btn => {
     btn.addEventListener('click', () => openDetailPopup(btn.getAttribute('data-event-id')));
@@ -499,9 +506,9 @@ function renderDayDetail(date){
   }
   detail.innerHTML = heading + dayEvents.map(e => {
     const timeStr = e.allDay ? 'All day' : fmtTime(e.startDate) + (e.endDate ? '–' + fmtTime(e.endDate) : '');
-    const detailsBtn = e.description ? ' <button type="button" class="details-pill" data-event-id="' + escapeHtml(e.id) + '">Details</button>' : '';
+    const detailsBtn = (e.description || e.url) ? ' <button type="button" class="details-pill" data-event-id="' + escapeHtml(e.id) + '">Details</button>' : '';
     return '<div class="cal-detail-event"><div class="cal-detail-title">' + escapeHtml(e.summary) + detailsBtn +
-      '</div><div class="cal-detail-meta">' + escapeHtml(timeStr) + '</div>' + locationLineHtml(e.location) + '</div>';
+      '</div><div class="cal-detail-meta">' + escapeHtml(timeStr) + '</div>' + locationLineHtml(e.location) + eventLinkLineHtml(e.url) + '</div>';
   }).join('');
   detail.querySelectorAll('button[data-event-id]').forEach(btn => {
     btn.addEventListener('click', () => openDetailPopup(btn.getAttribute('data-event-id')));
@@ -531,6 +538,16 @@ function openDetailPopup(eventId){
     locEl.innerHTML = '';
     mapEl.hidden = true;
     mapEl.innerHTML = '';
+  }
+
+  const linkEl = document.getElementById('detail-popup-link');
+  if (e.url){
+    linkEl.innerHTML = '<span class="loc-label">Link: </span><a href="' + escapeHtml(e.url) +
+      '" target="_blank" rel="noopener" class="maps-link">Open link</a>';
+    linkEl.hidden = false;
+  } else {
+    linkEl.hidden = true;
+    linkEl.innerHTML = '';
   }
 
   document.getElementById('detail-popup-body').textContent = e.description || '';
