@@ -1,6 +1,6 @@
 {
   "calendarName": "Teachers Quorum Activities",
-  "syncedAt": "2026-09-06T21:35:00Z",
+  "syncedAt": "2026-09-07T17:24:08Z",
   "events": [
     { "id": "7qvisqer7ehikpip18qtmppn40", "summary": "Bread: Kale Myers", "description": "Sacrament bread assignment", "start": "2026-09-06T09:00:00-06:00", "end": "2026-09-06T10:00:00-06:00", "allDay": false },
     { "id": "jtibg9g7o0lf3m1i34n2lc67do", "summary": "Lesson: Brother Bird", "description": "Sunday lesson assignment", "start": "2026-09-06T10:00:00-06:00", "end": "2026-09-06T11:00:00-06:00", "allDay": false },
@@ -9,6 +9,9 @@
     { "id": "ib6rapli4073p9581ag3g3s70o", "summary": "Lesson: Troy Slack", "description": "Sunday lesson assignment", "start": "2026-09-13T10:00:00-06:00", "end": "2026-09-13T11:00:00-06:00", "allDay": false },
     { "id": "6d6qn67fvht98da7c63v1o2pk0", "summary": "Combined Activity — Watch Activity Days Girls Play", "description": "Combined YM/YW activity — watching the Activity Days girls play.", "start": "2026-09-16T19:00:00-06:00", "end": "2026-09-16T20:30:00-06:00", "allDay": false },
     { "id": "74jje63c5jdp55qcpm49214o1c", "summary": "Bread: Henry Brinton", "description": "Sacrament bread assignment", "start": "2026-09-20T09:00:00-06:00", "end": "2026-09-20T10:00:00-06:00", "allDay": false },
-    { "id": "8h0hvvs4kn63fnurluot657npo", "summary": "Lesson: Brother Olson", "description": "Sunday lesson assignment", "start": "2026-09-20T10:00:00-06:00", "end": "2026-09-20T11:00:00-06:00", "allDay": false }
+    { "id": "8h0hvvs4kn63fnurluot657npo", "summary": "Lesson: Brother Olson", "description": "Sunday lesson assignment", "start": "2026-09-20T10:00:00-06:00", "end": "2026-09-20T11:00:00-06:00", "allDay": false },
+    { "id": "tr9kgd9pbv4ovtb4fckuu88t3c", "summary": "Combined Activity — Sand Volleyball with YW", "description": "Combined activity with Young Women — sand volleyball. Location guessed as Canyon View, needs confirmation.", "start": "2026-09-23T19:00:00-06:00", "end": "2026-09-23T20:30:00-06:00", "allDay": false },
+    { "id": "gald4tgjq74crfq42hqu29inng", "summary": "Bread: Troy Slack", "description": "Sacrament bread assignment", "start": "2026-09-27T09:00:00-06:00", "end": "2026-09-27T10:00:00-06:00", "allDay": false },
+    { "id": "sut5ddu499k4i3g05aoo19ujbo", "summary": "Lesson: Easton Cook", "description": "Sunday lesson assignment", "start": "2026-09-27T10:00:00-06:00", "end": "2026-09-27T11:00:00-06:00", "allDay": false }
   ]
 }
