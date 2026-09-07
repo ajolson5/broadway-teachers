@@ -87,10 +87,12 @@ h1,h2,h3{ font-family:'Archivo', system-ui, sans-serif; text-wrap:balance; font-
 .btn-link:hover, .btn-link:focus-visible{ text-decoration:underline; }
 .event .title{ font-weight:600; font-size:.97rem; }
 .event .meta{ color:var(--muted); font-size:.84rem; margin-top:.1rem; }
-.location-line{ font-size:.84rem; margin-top:.2rem; }
+.location-line{ font-size:.84rem; margin-top:.2rem; color:var(--ink-soft); }
 .location-line .loc-label{ color:var(--muted); }
-.location-line a{ color:var(--teal); text-decoration:none; }
-.location-line a:hover, .location-line a:focus-visible{ text-decoration:underline; }
+.maps-link{ color:var(--teal); text-decoration:none; font-weight:600; }
+.maps-link:hover, .maps-link:focus-visible{ text-decoration:underline; }
+.directions-link{ color:var(--accent-ink); text-decoration:none; font-weight:600; }
+.directions-link:hover, .directions-link:focus-visible{ text-decoration:underline; }
 .empty{ color:var(--muted); font-size:.9rem; font-style:italic; margin:0; }
 .reading-ref{ font-family:'IBM Plex Mono', monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--teal); margin-bottom:.3rem; }
 .reading-title{ font-family:'Archivo', system-ui, sans-serif; font-weight:800; letter-spacing:-.01em; font-size:1.25rem; margin-bottom:.6rem; }
@@ -162,10 +164,9 @@ footer{ margin-top:2.2rem; padding-top:1rem; border-top:1px solid var(--line); f
 .detail-popup-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:.6rem; margin-bottom:.35rem; }
 .detail-popup-head h3{ font-size:1.05rem; }
 .detail-popup-meta{ font-family:'IBM Plex Mono', monospace; font-size:.7rem; letter-spacing:.02em; color:var(--muted); margin-bottom:.35rem; }
-.detail-popup-location{ font-size:.86rem; margin-bottom:.75rem; }
+.detail-popup-location{ font-size:.86rem; margin-bottom:.75rem; color:var(--ink-soft); }
 .detail-popup-location .loc-label{ color:var(--muted); }
-.detail-popup-location a{ color:var(--teal); text-decoration:none; }
-.detail-popup-location a:hover, .detail-popup-location a:focus-visible{ text-decoration:underline; }
+.detail-popup-location .maps-link, .detail-popup-location .directions-link{ display:inline-block; margin-top:.2rem; }
 .detail-popup-map{ width:100%; height:200px; border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-bottom:.85rem; }
 .detail-popup-map iframe{ width:100%; height:100%; border:0; display:block; }
 .detail-popup-body{ font-size:.88rem; color:var(--ink-soft); white-space:pre-wrap; line-height:1.55; }
@@ -325,10 +326,17 @@ function mapsEmbedUrl(location){
   return 'https://maps.google.com/maps?q=' + encodeURIComponent(location) + '&output=embed';
 }
 
+const CHURCH_ADDRESS = '2235 Kingston Road, Grand Junction, CO 81507';
+
+function directionsUrl(destination){
+  return 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(CHURCH_ADDRESS) +
+    '&destination=' + encodeURIComponent(destination);
+}
+
 function locationLineHtml(location){
   if (!location) return '';
-  return '<div class="location-line"><span class="loc-label">Location: </span><a href="' + mapsSearchUrl(location) +
-    '" target="_blank" rel="noopener">' + escapeHtml(location) + '</a></div>';
+  return '<div class="location-line"><span class="loc-label">Location: </span>' + escapeHtml(location) +
+    ' <a href="' + mapsSearchUrl(location) + '" target="_blank" rel="noopener" class="maps-link">Open in Maps</a></div>';
 }
 
 function renderEvents(events){
@@ -453,8 +461,9 @@ function openDetailPopup(eventId){
   const locEl = document.getElementById('detail-popup-location');
   const mapEl = document.getElementById('detail-popup-map');
   if (e.location){
-    locEl.innerHTML = '<span class="loc-label">Location: </span><a href="' + mapsSearchUrl(e.location) +
-      '" target="_blank" rel="noopener">' + escapeHtml(e.location) + '</a>';
+    locEl.innerHTML = '<span class="loc-label">Location: </span>' + escapeHtml(e.location) +
+      ' <a href="' + mapsSearchUrl(e.location) + '" target="_blank" rel="noopener" class="maps-link">Open in Maps</a>' +
+      ' <a href="' + directionsUrl(e.location) + '" target="_blank" rel="noopener" class="directions-link">Get Directions</a>';
     locEl.hidden = false;
     mapEl.innerHTML = '<iframe src="' + mapsEmbedUrl(e.location) + '" loading="lazy" ' +
       'referrerpolicy="no-referrer-when-downgrade" title="Map of ' + escapeHtml(e.location) + '"></iframe>';
