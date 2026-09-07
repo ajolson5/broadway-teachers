@@ -250,6 +250,7 @@ table.roster-edit input{ width:100%; }
           <div class="panel-head-right">
             <a class="btn-link" id="edit-calendar-link" href="https://calendar.google.com/calendar/u/0/r?cid=ba559c074f862e368309e91f5012d9839197c47750e175b174d963b3d87eb288%40group.calendar.google.com" target="_blank" rel="noopener" hidden>Edit in Google Calendar</a>
             <button type="button" class="btn-link" id="view-calendar-btn">View Calendar</button>
+            <button type="button" class="btn-link" id="sync-events-btn" title="Refresh events from the last sync">Sync</button>
             <span class="panel-tag" id="synced-tag">Loading…</span>
           </div>
         </div>
@@ -757,7 +758,7 @@ async function fetchContent(){
     const r = await fetch('/api/content', { cache: 'no-store' });
     CONTENT = await r.json();
   } catch (err) {
-    CONTENT = CONTENT || { assignments: { tag: '', rows: [] }, reading: { tag: '', reference: '', title: '', verse: '', question: '' }, skills: { tag: '', items: [] }, projects: { tag: '', items: [] } };
+    CONTENT = CONTENT || { assignments: { tag: '', rows: [] }, reading: { tag: '', items: [] }, skills: { tag: '', items: [] }, projects: { tag: '', items: [] } };
   }
   renderAllSections(false);
 }
@@ -857,18 +858,25 @@ document.getElementById('edit-save-btn').addEventListener('click', async () => {
 
 fetchContent();
 
-fetch('events.json', {cache:'no-store'})
-  .then(r => r.json())
-  .then(data => {
+async function loadEvents(){
+  const syncBtn = document.getElementById('sync-events-btn');
+  if (syncBtn){ syncBtn.disabled = true; syncBtn.textContent = 'Syncing…'; }
+  try {
+    const r = await fetch('events.json', { cache: 'no-store' });
+    const data = await r.json();
     document.getElementById('synced-tag').textContent = 'Synced ' +
-      new Date(data.syncedAt).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-    ALL_EVENTS = (data.events || []).map(e => ({...e, startDate: new Date(e.start), endDate: e.end ? new Date(e.end) : null}));
+      new Date(data.syncedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    ALL_EVENTS = (data.events || []).map(e => ({ ...e, startDate: new Date(e.start), endDate: e.end ? new Date(e.end) : null }));
     renderEvents(data.events || []);
-  })
-  .catch(() => {
+  } catch (err) {
     document.getElementById('synced-tag').textContent = 'Sync unavailable';
     document.getElementById('events').innerHTML = '<p class="empty">Could not load events right now.</p>';
-  });
+  }
+  if (syncBtn){ syncBtn.disabled = false; syncBtn.textContent = 'Sync'; }
+}
+
+document.getElementById('sync-events-btn').addEventListener('click', loadEvents);
+loadEvents();
 </script>
 </body>
 </html>
