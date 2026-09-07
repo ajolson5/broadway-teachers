@@ -15,11 +15,19 @@ const DEFAULT_CONTENT = {
     ]
   },
   reading: {
-    tag: 'Come, Follow Me',
-    reference: "Sample reference — confirm this week's actual assignment",
-    title: 'Doctrine & Covenants 84',
-    verse: '…seek not the things of this world but seek ye first to build up the kingdom of God…',
-    question: 'Discussion question: what does it look like to hold the priesthood "in remembrance" this week?'
+    tag: 'FSY Guide & Magazine',
+    items: [
+      {
+        title: 'FSY Guide — Chapter 9: You Are Blessed by Priesthood Keys and Authority',
+        url: 'https://www.churchofjesuschrist.org/study/ftsoy/2026/09?lang=eng',
+        note: "This month's chapter, studied on Fast Sunday (Sept 6)."
+      },
+      {
+        title: 'Week 2 Lesson — Learn more about the restoration of the priesthood',
+        url: 'https://www.churchofjesuschrist.org/study/ftsoy/2026/09?lang=eng',
+        note: 'From the September FSY magazine, for this Sunday (Sept 13).'
+      }
+    ]
   },
   skills: {
     tag: 'Quorum goals',

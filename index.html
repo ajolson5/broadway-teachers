@@ -95,10 +95,13 @@ h1,h2,h3{ font-family:'Archivo', system-ui, sans-serif; text-wrap:balance; font-
 .directions-link{ color:var(--accent-ink); text-decoration:none; font-weight:600; }
 .directions-link:hover, .directions-link:focus-visible{ text-decoration:underline; }
 .empty{ color:var(--muted); font-size:.9rem; font-style:italic; margin:0; }
-.reading-ref{ font-family:'IBM Plex Mono', monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--teal); margin-bottom:.3rem; }
-.reading-title{ font-family:'Archivo', system-ui, sans-serif; font-weight:800; letter-spacing:-.01em; font-size:1.25rem; margin-bottom:.6rem; }
-.reading-verse{ border-left:3px solid var(--accent); padding-left:.85rem; color:var(--ink-soft); font-size:.94rem; font-style:italic; margin-bottom:.55rem; }
-.reading-question{ font-size:.86rem; color:var(--muted); }
+.reading-items{ display:flex; flex-direction:column; gap:.75rem; }
+.reading-item{ padding-bottom:.7rem; border-bottom:1px solid var(--line); }
+.reading-item:last-child{ border-bottom:none; padding-bottom:0; }
+.reading-item-title{ font-weight:700; font-size:.97rem; }
+.reading-item-title a{ color:var(--teal); text-decoration:none; }
+.reading-item-title a:hover, .reading-item-title a:focus-visible{ text-decoration:underline; }
+.reading-item-note{ color:var(--ink-soft); font-size:.86rem; margin-top:.25rem; white-space:pre-wrap; }
 table.roster{ width:100%; border-collapse:collapse; font-size:.9rem; }
 table.roster th{ text-align:left; font-family:'IBM Plex Mono', monospace; font-size:.66rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:500; padding:0 .5rem .5rem 0; border-bottom:1px solid var(--line); }
 table.roster td{ padding:.55rem .5rem .55rem 0; border-bottom:1px solid var(--line); vertical-align:top; }
@@ -234,7 +237,7 @@ table.roster-edit input{ width:100%; }
   </div>
 
   <div class="notice">
-    <span><b>Events sync automatically</b> from the Teachers Quorum Activities Google Calendar. Assignments, reading, skills, and projects below are placeholders — send the real details and this page gets updated to match.</span>
+    <span><b>Events sync automatically</b> from the Teachers Quorum Activities Google Calendar. Assignments, skills, and projects below are placeholders — send the real details and this page gets updated to match.</span>
   </div>
 
   <div class="board">
@@ -245,7 +248,7 @@ table.roster-edit input{ width:100%; }
         <div class="panel-head">
           <h2>Upcoming Events</h2>
           <div class="panel-head-right">
-            <a class="btn-link" id="edit-calendar-link" href="https://calendar.google.com/calendar/u/0/r?cid=ba559c074f862e368309e91f5012d9839197c47750e175b174d963b3d87eb288%40group.calendar.google.com" target="_blank" rel="noopener">Edit in Google Calendar</a>
+            <a class="btn-link" id="edit-calendar-link" href="https://calendar.google.com/calendar/u/0/r?cid=ba559c074f862e368309e91f5012d9839197c47750e175b174d963b3d87eb288%40group.calendar.google.com" target="_blank" rel="noopener" hidden>Edit in Google Calendar</a>
             <button type="button" class="btn-link" id="view-calendar-btn">View Calendar</button>
             <span class="panel-tag" id="synced-tag">Loading…</span>
           </div>
@@ -637,18 +640,38 @@ function renderReading(editing){
   document.getElementById('reading-tag').textContent = data.tag;
   const body = document.getElementById('reading-body');
   if (!editing){
-    body.innerHTML = '<div class="reading-ref">' + escapeHtml(data.reference) + '</div>' +
-      '<div class="reading-title">' + escapeHtml(data.title) + '</div>' +
-      '<div class="reading-verse">"' + escapeHtml(data.verse) + '"</div>' +
-      '<div class="reading-question">' + escapeHtml(data.question) + '</div>';
+    if (!data.items.length){
+      body.innerHTML = '<p class="empty">Nothing assigned yet.</p>';
+      return;
+    }
+    body.innerHTML = '<div class="reading-items">' + data.items.map(item => {
+      const titleHtml = item.url
+        ? '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener">' + escapeHtml(item.title) + '</a>'
+        : escapeHtml(item.title);
+      return '<div class="reading-item"><div class="reading-item-title">' + titleHtml + '</div>' +
+        (item.note ? '<div class="reading-item-note">' + escapeHtml(item.note) + '</div>' : '') + '</div>';
+    }).join('') + '</div>';
     return;
   }
   body.innerHTML = fieldHtml('Section label', 'tag', data.tag) +
-    fieldHtml('Reference note', 'reference', data.reference) +
-    fieldHtml('Title', 'title', data.title) +
-    fieldAreaHtml('Verse', 'verse', data.verse) +
-    fieldAreaHtml('Discussion question', 'question', data.question);
+    data.items.map((item, i) =>
+      '<div class="skill-edit">' +
+        '<div class="skill-edit-head">' +
+        '<input class="field-input" data-row-field="title" data-i="' + i + '" value="' + escapeHtml(item.title) + '" placeholder="e.g. FSY Guide — Chapter 9">' +
+        '<button type="button" class="row-remove-btn" data-remove-i="' + i + '" aria-label="Remove">×</button>' +
+        '</div>' +
+        '<div class="field-group"><label class="field-label">Link (optional)</label>' +
+        '<input class="field-input" type="url" data-row-field="url" data-i="' + i + '" value="' + escapeHtml(item.url) + '" placeholder="https://..."></div>' +
+        '<textarea class="field-textarea" data-row-field="note" data-i="' + i + '" placeholder="Note or quote">' + escapeHtml(item.note) + '</textarea>' +
+      '</div>'
+    ).join('') +
+    '<button type="button" class="add-row-btn" id="reading-add-row">+ Add reading item</button>';
   wireSimpleFields(body, DRAFT.reading);
+  wireItemFields(body, DRAFT.reading.items, () => renderReading(true));
+  body.querySelector('#reading-add-row').addEventListener('click', () => {
+    DRAFT.reading.items.push({ title: '', url: '', note: '' });
+    renderReading(true);
+  });
 }
 
 const SKILL_STATUS_MARK = { done: '✓', doing: '◐', todo: '○' };
@@ -744,6 +767,7 @@ function enterEditMode(){
   EDIT_MODE = true;
   document.getElementById('edit-fab').hidden = true;
   document.getElementById('edit-bar').hidden = false;
+  document.getElementById('edit-calendar-link').hidden = false;
   document.body.classList.add('editing');
   renderAllSections(true);
 }
@@ -754,6 +778,7 @@ function exitEditMode(){
   EDIT_CODE_VALUE = null;
   document.getElementById('edit-bar').hidden = true;
   document.getElementById('edit-fab').hidden = false;
+  document.getElementById('edit-calendar-link').hidden = true;
   document.body.classList.remove('editing');
   renderAllSections(false);
 }
@@ -817,6 +842,7 @@ document.getElementById('edit-save-btn').addEventListener('click', async () => {
       EDIT_CODE_VALUE = null;
       document.getElementById('edit-bar').hidden = true;
       document.getElementById('edit-fab').hidden = false;
+      document.getElementById('edit-calendar-link').hidden = true;
       document.body.classList.remove('editing');
       statusEl.textContent = prevStatus;
       saveBtn.disabled = false;
