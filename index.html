@@ -118,23 +118,23 @@ footer{ margin-top:2.2rem; padding-top:1rem; border-top:1px solid var(--line); f
 
 .cal-overlay{ position:fixed; inset:0; background:var(--overlay); display:flex; align-items:center; justify-content:center; padding:1.25rem; z-index:100; }
 .cal-overlay[hidden]{ display:none; }
-.cal-modal{ background:var(--paper-raised); border-radius:14px; box-shadow:var(--shadow); width:100%; max-width:640px; max-height:min(720px, 90vh); display:flex; flex-direction:column; overflow:hidden; }
+.cal-modal{ background:var(--paper-raised); border-radius:14px; box-shadow:var(--shadow); width:100%; max-width:1220px; max-height:min(760px, 90vh); display:flex; flex-direction:column; overflow:hidden; }
 .cal-header{ display:flex; align-items:center; justify-content:space-between; padding:.9rem 1.1rem; border-bottom:1px solid var(--line); gap:.5rem; flex:0 0 auto; }
 .cal-nav-group{ display:flex; align-items:center; gap:.5rem; }
-.cal-month-label{ font-family:'Fraunces', serif; font-weight:600; font-size:1.1rem; min-width:11ch; text-align:center; }
-.cal-nav, .cal-close{ appearance:none; background:var(--paper); border:1px solid var(--line); color:var(--ink); width:2rem; height:2rem; border-radius:8px; font-size:1rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.cal-month-label{ font-family:'Fraunces', serif; font-weight:600; font-size:1.3rem; min-width:12ch; text-align:center; }
+.cal-nav, .cal-close{ appearance:none; background:var(--paper); border:1px solid var(--line); color:var(--ink); width:2.2rem; height:2.2rem; border-radius:8px; font-size:1.1rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .cal-nav:hover, .cal-close:hover{ border-color:var(--teal); color:var(--teal); }
-.cal-body{ overflow-y:auto; padding:.9rem 1.1rem; flex:1 1 auto; }
-.cal-weekdays{ display:grid; grid-template-columns:repeat(7,1fr); gap:.3rem; font-family:'IBM Plex Mono', monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); text-align:center; margin-bottom:.4rem; }
-.cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:.3rem; }
-.cal-day{ appearance:none; font-family:inherit; color:inherit; min-height:4.4rem; border:1px solid var(--line); border-radius:8px; padding:.3rem; font-size:.68rem; cursor:pointer; background:var(--paper); display:flex; flex-direction:column; gap:.2rem; text-align:left; overflow:hidden; }
+.cal-body{ overflow-y:auto; padding:1rem 1.3rem; flex:1 1 auto; }
+.cal-weekdays{ display:grid; grid-template-columns:repeat(7,1fr); gap:.5rem; font-family:'IBM Plex Mono', monospace; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); text-align:center; margin-bottom:.5rem; }
+.cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:.5rem; }
+.cal-day{ appearance:none; font-family:inherit; color:inherit; min-height:6rem; border:1px solid var(--line); border-radius:8px; padding:.4rem; font-size:.76rem; cursor:pointer; background:var(--paper); display:flex; flex-direction:column; gap:.25rem; text-align:left; overflow:hidden; }
 .cal-day:hover{ border-color:var(--teal); }
 .cal-day.outside{ opacity:.4; }
 .cal-day.today .num{ color:var(--brass-ink); }
 .cal-day.today{ border-color:var(--brass); }
 .cal-day.selected{ background:var(--teal-soft); border-color:var(--teal); }
 .cal-day .num{ font-family:'IBM Plex Mono', monospace; font-weight:600; font-variant-numeric:tabular-nums; }
-.cal-pill{ font-size:.6rem; line-height:1.3; padding:.05rem .3rem; border-radius:5px; background:var(--teal-soft); color:var(--teal); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cal-pill{ font-size:.68rem; line-height:1.3; padding:.08rem .4rem; border-radius:5px; background:var(--teal-soft); color:var(--teal); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .cal-pill.sunday-am{ background:var(--yellow-soft); color:var(--yellow-ink); }
 .cal-pill.wed-night{ background:var(--blue-soft); color:var(--blue-ink); }
 .cal-more{ font-size:.6rem; color:var(--muted); }
@@ -345,7 +345,7 @@ function renderCalendarMonth(){
   for (let i = 0; i < 42; i++){
     const cellDate = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i);
     const dayEvents = ALL_EVENTS.filter(e => sameDay(e.startDate, cellDate)).sort((a, b) => a.startDate - b.startDate);
-    const shown = dayEvents.slice(0, 2);
+    const shown = dayEvents.slice(0, 3);
     const extra = dayEvents.length - shown.length;
 
     const cell = document.createElement('button');
