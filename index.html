@@ -171,9 +171,56 @@ footer{ margin-top:2.2rem; padding-top:1rem; border-top:1px solid var(--line); f
 .detail-popup-map{ width:100%; height:200px; border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-bottom:.85rem; }
 .detail-popup-map iframe{ width:100%; height:100%; border:0; display:block; }
 .detail-popup-body{ font-size:.88rem; color:var(--ink-soft); white-space:pre-wrap; line-height:1.55; }
+
+.edit-fab{ position:fixed; top:1rem; right:1rem; z-index:60; appearance:none; background:var(--accent); color:#fff; border:none; padding:.5rem .95rem; border-radius:99px; font-family:'IBM Plex Sans', sans-serif; font-weight:700; font-size:.8rem; cursor:pointer; box-shadow:var(--shadow); }
+.edit-fab:hover, .edit-fab:focus-visible{ filter:brightness(1.08); }
+.edit-fab[hidden]{ display:none; }
+
+body.editing{ padding-bottom:4.5rem; }
+
+.edit-code-overlay{ position:fixed; inset:0; background:var(--overlay); display:flex; align-items:center; justify-content:center; padding:1.25rem; z-index:120; }
+.edit-code-overlay[hidden]{ display:none; }
+.edit-code-modal{ background:var(--paper-raised); border-radius:10px; box-shadow:var(--shadow); width:100%; max-width:340px; padding:1.1rem 1.2rem 1.3rem; }
+.edit-code-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:.6rem; margin-bottom:.35rem; }
+.edit-code-head h3{ font-size:1.05rem; }
+.edit-code-hint{ font-size:.82rem; color:var(--muted); margin:0 0 .85rem; }
+.edit-code-field{ width:100%; font-family:'IBM Plex Mono', monospace; font-size:1.1rem; letter-spacing:.15em; text-align:center; padding:.55rem; border:1px solid var(--line); border-radius:6px; background:var(--paper); color:var(--ink); margin-bottom:.6rem; }
+.edit-code-error{ color:#c0392b; font-size:.8rem; margin:0 0 .6rem; }
+.edit-code-submit{ width:100%; appearance:none; background:var(--accent); color:#fff; border:none; padding:.55rem; border-radius:6px; font-family:'IBM Plex Sans', sans-serif; font-weight:700; font-size:.88rem; cursor:pointer; }
+.edit-code-submit:hover, .edit-code-submit:focus-visible{ filter:brightness(1.08); }
+
+.edit-bar{ position:fixed; left:0; right:0; bottom:0; z-index:60; background:var(--paper-raised); border-top:1px solid var(--line); padding:.75rem 1.25rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; box-shadow:0 -2px 10px rgba(17,19,24,.08); }
+.edit-bar[hidden]{ display:none; }
+.edit-bar-status{ font-size:.82rem; color:var(--ink-soft); }
+.edit-bar-actions{ display:flex; gap:.6rem; flex:0 0 auto; }
+.edit-bar-btn{ appearance:none; border:none; padding:.5rem 1.1rem; border-radius:6px; font-family:'IBM Plex Sans', sans-serif; font-weight:700; font-size:.85rem; cursor:pointer; }
+.edit-bar-cancel{ background:var(--paper); color:var(--ink-soft); border:1px solid var(--line); }
+.edit-bar-cancel:hover, .edit-bar-cancel:focus-visible{ border-color:var(--muted); }
+.edit-bar-save{ background:var(--accent); color:#fff; }
+.edit-bar-save:hover, .edit-bar-save:focus-visible{ filter:brightness(1.08); }
+.edit-bar-save:disabled{ opacity:.6; cursor:default; }
+
+.field-label{ display:block; font-family:'IBM Plex Mono', monospace; font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:.25rem; }
+.field-group{ margin-bottom:.85rem; }
+.field-input, .field-textarea{ width:100%; font-family:'IBM Plex Sans', sans-serif; font-size:.88rem; color:var(--ink); background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:.4rem .55rem; }
+.field-textarea{ resize:vertical; min-height:3.2rem; font-family:inherit; line-height:1.5; }
+.field-input:focus-visible, .field-textarea:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+
+table.roster-edit td{ padding:.35rem .35rem .35rem 0; }
+table.roster-edit input{ width:100%; }
+.row-remove-btn{ appearance:none; background:none; border:1px solid var(--line); color:var(--muted); width:1.8rem; height:1.8rem; border-radius:6px; cursor:pointer; font-size:.9rem; line-height:1; }
+.row-remove-btn:hover, .row-remove-btn:focus-visible{ border-color:#c0392b; color:#c0392b; }
+.add-row-btn{ display:block; width:100%; margin-top:.6rem; appearance:none; background:none; border:1px dashed var(--line); color:var(--muted); padding:.5rem; border-radius:6px; font-family:'IBM Plex Sans', sans-serif; font-size:.84rem; font-weight:600; cursor:pointer; }
+.add-row-btn:hover, .add-row-btn:focus-visible{ border-color:var(--accent); color:var(--accent-ink); }
+
+.skill-edit, .project-edit{ border:1px solid var(--line); border-radius:6px; padding:.6rem; margin-bottom:.6rem; }
+.skill-edit-head, .project-edit-head{ display:flex; gap:.5rem; align-items:center; margin-bottom:.45rem; }
+.skill-edit-head select, .project-edit-head select{ font-family:'IBM Plex Mono', monospace; font-size:.72rem; border:1px solid var(--line); border-radius:6px; padding:.3rem .4rem; background:var(--paper); color:var(--ink); }
+.skill-edit-head .field-input, .project-edit-head .field-input{ flex:1 1 auto; }
 </style>
 </head>
 <body>
+<button type="button" class="edit-fab" id="edit-fab">Edit</button>
 <div class="wrap">
 
   <div class="masthead">
@@ -198,6 +245,7 @@ footer{ margin-top:2.2rem; padding-top:1rem; border-top:1px solid var(--line); f
         <div class="panel-head">
           <h2>Upcoming Events</h2>
           <div class="panel-head-right">
+            <a class="btn-link" id="edit-calendar-link" href="https://calendar.google.com/calendar/u/0/r?cid=ba559c074f862e368309e91f5012d9839197c47750e175b174d963b3d87eb288%40group.calendar.google.com" target="_blank" rel="noopener">Edit in Google Calendar</a>
             <button type="button" class="btn-link" id="view-calendar-btn">View Calendar</button>
             <span class="panel-tag" id="synced-tag">Loading…</span>
           </div>
@@ -210,19 +258,9 @@ footer{ margin-top:2.2rem; padding-top:1rem; border-top:1px solid var(--line); f
       <div class="panel">
         <div class="panel-head">
           <h2>Assignments</h2>
-          <span class="panel-tag">This Sunday</span>
+          <span class="panel-tag" id="assignments-tag">—</span>
         </div>
-        <table class="roster">
-          <thead><tr><th>Duty</th><th>Assigned</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td>Preside / conduct</td><td class="who">Bro. Carver</td><td class="note">Quorum adviser</td></tr>
-            <tr><td>Opening prayer</td><td class="who">Ethan</td><td class="note">—</td></tr>
-            <tr><td>Prepare sacrament</td><td class="who">Mason, Jake</td><td class="note">Arrive 8:45</td></tr>
-            <tr><td>Pass sacrament</td><td class="who">Tyler, Caleb, Ben</td><td class="note">Rotate rows</td></tr>
-            <tr><td>Lesson / teaching</td><td class="who">Ethan</td><td class="note">Topic: ministering</td></tr>
-            <tr><td>Closing prayer</td><td class="who">Caleb</td><td class="note">—</td></tr>
-          </tbody>
-        </table>
+        <div id="assignments-body"></div>
       </div>
 
     </div>
@@ -230,30 +268,18 @@ footer{ margin-top:2.2rem; padding-top:1rem; border-top:1px solid var(--line); f
     <div class="col-right">
 
       <div class="panel">
-        <div class="panel-head"><h2>This Week's Reading</h2><span class="panel-tag">Come, Follow Me</span></div>
-        <div class="reading-ref">Sample reference — confirm this week's actual assignment</div>
-        <div class="reading-title">Doctrine &amp; Covenants 84</div>
-        <div class="reading-verse">"…seek not the things of this world but seek ye first to build up the kingdom of God…"</div>
-        <div class="reading-question">Discussion question: what does it look like to hold the priesthood "in remembrance" this week?</div>
+        <div class="panel-head"><h2>This Week's Reading</h2><span class="panel-tag" id="reading-tag">—</span></div>
+        <div id="reading-body"></div>
       </div>
 
       <div class="panel">
-        <div class="panel-head"><h2>Skills We're Working On</h2><span class="panel-tag">Quorum goals</span></div>
-        <div class="skills">
-          <div class="skill done"><div class="mark">✓</div><div class="body"><b>Prepare &amp; pass the sacrament reverently</b><span>Practiced Sept 2 — most of quorum comfortable now</span></div></div>
-          <div class="skill doing"><div class="mark">◐</div><div class="body"><b>Teach a 10-minute gospel lesson</b><span>Ethan going this week, Mason next</span></div></div>
-          <div class="skill doing"><div class="mark">◐</div><div class="body"><b>Plan &amp; lead a quorum activity</b><span>Caleb planning the Sept 16 service prep night</span></div></div>
-          <div class="skill"><div class="mark">○</div><div class="body"><b>Have a ministering conversation</b><span>Not started</span></div></div>
-        </div>
+        <div class="panel-head"><h2>Skills We're Working On</h2><span class="panel-tag" id="skills-tag">—</span></div>
+        <div id="skills-body"></div>
       </div>
 
       <div class="panel">
-        <div class="panel-head"><h2>Projects</h2><span class="panel-tag">Ongoing</span></div>
-        <div class="projects">
-          <div class="project"><div class="project-head"><h3>Widow lawn care rotation</h3><span class="pill active">In progress</span></div><p>Weekly mowing for Sis. Hargrove — Jake &amp; Tyler on rotation through October.</p></div>
-          <div class="project"><div class="project-head"><h3>Food pantry drive</h3><span class="pill planning">Planning</span></div><p>Collecting canned goods at the Sept 16 activity for the ward pantry shelf.</p></div>
-          <div class="project"><div class="project-head"><h3>Eagle project support</h3><span class="pill done">Complete</span></div><p>Quorum helped Ben finish his trail-marker project in August.</p></div>
-        </div>
+        <div class="panel-head"><h2>Projects</h2><span class="panel-tag" id="projects-tag">—</span></div>
+        <div id="projects-body"></div>
       </div>
 
     </div>
@@ -286,6 +312,29 @@ footer{ margin-top:2.2rem; padding-top:1rem; border-top:1px solid var(--line); f
     <div class="cal-detail" id="cal-detail">
       <p class="empty">Click a day to see its events.</p>
     </div>
+  </div>
+</div>
+
+<div class="edit-code-overlay" id="edit-code-overlay" hidden>
+  <div class="edit-code-modal" role="dialog" aria-modal="true" aria-labelledby="edit-code-title">
+    <div class="edit-code-head">
+      <h3 id="edit-code-title">Enter Edit Code</h3>
+      <button class="cal-close" id="edit-code-close" type="button" aria-label="Cancel">×</button>
+    </div>
+    <p class="edit-code-hint">Ask the quorum adviser for the code to edit this page.</p>
+    <form id="edit-code-form">
+      <input type="password" inputmode="numeric" autocomplete="off" id="edit-code-input" placeholder="Edit code" class="edit-code-field">
+      <p class="edit-code-error" id="edit-code-error" hidden>That code didn't work — try again.</p>
+      <button type="submit" class="edit-code-submit">Unlock Editing</button>
+    </form>
+  </div>
+</div>
+
+<div class="edit-bar" id="edit-bar" hidden>
+  <span class="edit-bar-status" id="edit-bar-status">Editing — Upcoming Events isn't included; use Edit in Google Calendar for that.</span>
+  <div class="edit-bar-actions">
+    <button type="button" class="edit-bar-btn edit-bar-cancel" id="edit-cancel-btn">Cancel</button>
+    <button type="button" class="edit-bar-btn edit-bar-save" id="edit-save-btn">Save Changes</button>
   </div>
 </div>
 
@@ -507,9 +556,280 @@ document.getElementById('detail-overlay').addEventListener('click', ev => {
 });
 document.addEventListener('keydown', ev => {
   if (ev.key !== 'Escape') return;
+  if (!document.getElementById('edit-code-overlay').hidden){ document.getElementById('edit-code-overlay').hidden = true; return; }
   if (!document.getElementById('detail-overlay').hidden){ closeDetailPopup(); return; }
   if (!document.getElementById('cal-overlay').hidden) closeCalendarModal();
 });
+
+// ---- Editable content (Assignments / Reading / Skills / Projects) ----
+
+let CONTENT = null;
+let DRAFT = null;
+let EDIT_MODE = false;
+let EDIT_CODE_VALUE = null;
+
+function fieldHtml(label, key, value){
+  return '<div class="field-group"><label class="field-label">' + escapeHtml(label) + '</label>' +
+    '<input class="field-input" data-simple-field="' + key + '" value="' + escapeHtml(value) + '"></div>';
+}
+
+function fieldAreaHtml(label, key, value){
+  return '<div class="field-group"><label class="field-label">' + escapeHtml(label) + '</label>' +
+    '<textarea class="field-textarea" data-simple-field="' + key + '">' + escapeHtml(value) + '</textarea></div>';
+}
+
+function wireSimpleFields(container, targetObj){
+  container.querySelectorAll('[data-simple-field]').forEach(el => {
+    const handler = e => { targetObj[e.target.getAttribute('data-simple-field')] = e.target.value; };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+  });
+}
+
+function wireItemFields(container, items, rerender){
+  container.querySelectorAll('[data-row-field]').forEach(el => {
+    const handler = e => {
+      const i = Number(e.target.getAttribute('data-i'));
+      items[i][e.target.getAttribute('data-row-field')] = e.target.value;
+    };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+  });
+  container.querySelectorAll('[data-remove-i]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      items.splice(Number(btn.getAttribute('data-remove-i')), 1);
+      rerender();
+    });
+  });
+}
+
+function renderAssignments(editing){
+  const data = editing ? DRAFT.assignments : CONTENT.assignments;
+  document.getElementById('assignments-tag').textContent = data.tag;
+  const body = document.getElementById('assignments-body');
+  if (!editing){
+    body.innerHTML = '<table class="roster"><thead><tr><th>Duty</th><th>Assigned</th><th>Notes</th></tr></thead><tbody>' +
+      data.rows.map(r => '<tr><td>' + escapeHtml(r.duty) + '</td><td class="who">' + escapeHtml(r.assigned) +
+        '</td><td class="note">' + escapeHtml(r.note) + '</td></tr>').join('') +
+      '</tbody></table>';
+    return;
+  }
+  body.innerHTML = fieldHtml('Section label', 'tag', data.tag) +
+    '<table class="roster roster-edit"><thead><tr><th>Duty</th><th>Assigned</th><th>Notes</th><th></th></tr></thead><tbody>' +
+    data.rows.map((r, i) => '<tr>' +
+      '<td><input class="field-input" data-row-field="duty" data-i="' + i + '" value="' + escapeHtml(r.duty) + '"></td>' +
+      '<td><input class="field-input" data-row-field="assigned" data-i="' + i + '" value="' + escapeHtml(r.assigned) + '"></td>' +
+      '<td><input class="field-input" data-row-field="note" data-i="' + i + '" value="' + escapeHtml(r.note) + '"></td>' +
+      '<td><button type="button" class="row-remove-btn" data-remove-i="' + i + '" aria-label="Remove row">×</button></td>' +
+      '</tr>').join('') +
+    '</tbody></table>' +
+    '<button type="button" class="add-row-btn" id="assignments-add-row">+ Add row</button>';
+  wireSimpleFields(body, DRAFT.assignments);
+  wireItemFields(body, DRAFT.assignments.rows, () => renderAssignments(true));
+  body.querySelector('#assignments-add-row').addEventListener('click', () => {
+    DRAFT.assignments.rows.push({ duty: '', assigned: '', note: '' });
+    renderAssignments(true);
+  });
+}
+
+function renderReading(editing){
+  const data = editing ? DRAFT.reading : CONTENT.reading;
+  document.getElementById('reading-tag').textContent = data.tag;
+  const body = document.getElementById('reading-body');
+  if (!editing){
+    body.innerHTML = '<div class="reading-ref">' + escapeHtml(data.reference) + '</div>' +
+      '<div class="reading-title">' + escapeHtml(data.title) + '</div>' +
+      '<div class="reading-verse">"' + escapeHtml(data.verse) + '"</div>' +
+      '<div class="reading-question">' + escapeHtml(data.question) + '</div>';
+    return;
+  }
+  body.innerHTML = fieldHtml('Section label', 'tag', data.tag) +
+    fieldHtml('Reference note', 'reference', data.reference) +
+    fieldHtml('Title', 'title', data.title) +
+    fieldAreaHtml('Verse', 'verse', data.verse) +
+    fieldAreaHtml('Discussion question', 'question', data.question);
+  wireSimpleFields(body, DRAFT.reading);
+}
+
+const SKILL_STATUS_MARK = { done: '✓', doing: '◐', todo: '○' };
+
+function renderSkills(editing){
+  const data = editing ? DRAFT.skills : CONTENT.skills;
+  document.getElementById('skills-tag').textContent = data.tag;
+  const body = document.getElementById('skills-body');
+  if (!editing){
+    body.innerHTML = '<div class="skills">' + data.items.map(item => {
+      const cls = item.status === 'done' ? ' done' : item.status === 'doing' ? ' doing' : '';
+      return '<div class="skill' + cls + '"><div class="mark">' + (SKILL_STATUS_MARK[item.status] || '○') +
+        '</div><div class="body"><b>' + escapeHtml(item.title) + '</b><span>' + escapeHtml(item.note) + '</span></div></div>';
+    }).join('') + '</div>';
+    return;
+  }
+  body.innerHTML = fieldHtml('Section label', 'tag', data.tag) +
+    data.items.map((item, i) =>
+      '<div class="skill-edit"><div class="skill-edit-head">' +
+        '<select data-row-field="status" data-i="' + i + '">' +
+          '<option value="todo"' + (item.status === 'todo' ? ' selected' : '') + '>Not started</option>' +
+          '<option value="doing"' + (item.status === 'doing' ? ' selected' : '') + '>In progress</option>' +
+          '<option value="done"' + (item.status === 'done' ? ' selected' : '') + '>Done</option>' +
+        '</select>' +
+        '<input class="field-input" data-row-field="title" data-i="' + i + '" value="' + escapeHtml(item.title) + '" placeholder="Skill title">' +
+        '<button type="button" class="row-remove-btn" data-remove-i="' + i + '" aria-label="Remove">×</button>' +
+      '</div><input class="field-input" data-row-field="note" data-i="' + i + '" value="' + escapeHtml(item.note) + '" placeholder="Note"></div>'
+    ).join('') +
+    '<button type="button" class="add-row-btn" id="skills-add-row">+ Add skill</button>';
+  wireSimpleFields(body, DRAFT.skills);
+  wireItemFields(body, DRAFT.skills.items, () => renderSkills(true));
+  body.querySelector('#skills-add-row').addEventListener('click', () => {
+    DRAFT.skills.items.push({ status: 'todo', title: '', note: '' });
+    renderSkills(true);
+  });
+}
+
+const PROJECT_STATUS_LABEL = { active: 'In progress', planning: 'Planning', done: 'Complete' };
+
+function renderProjects(editing){
+  const data = editing ? DRAFT.projects : CONTENT.projects;
+  document.getElementById('projects-tag').textContent = data.tag;
+  const body = document.getElementById('projects-body');
+  if (!editing){
+    body.innerHTML = '<div class="projects">' + data.items.map(item =>
+      '<div class="project"><div class="project-head"><h3>' + escapeHtml(item.title) + '</h3><span class="pill ' +
+      item.status + '">' + escapeHtml(PROJECT_STATUS_LABEL[item.status] || item.status) + '</span></div><p>' +
+      escapeHtml(item.note) + '</p></div>'
+    ).join('') + '</div>';
+    return;
+  }
+  body.innerHTML = fieldHtml('Section label', 'tag', data.tag) +
+    data.items.map((item, i) =>
+      '<div class="project-edit"><div class="project-edit-head">' +
+        '<select data-row-field="status" data-i="' + i + '">' +
+          '<option value="planning"' + (item.status === 'planning' ? ' selected' : '') + '>Planning</option>' +
+          '<option value="active"' + (item.status === 'active' ? ' selected' : '') + '>In progress</option>' +
+          '<option value="done"' + (item.status === 'done' ? ' selected' : '') + '>Complete</option>' +
+        '</select>' +
+        '<input class="field-input" data-row-field="title" data-i="' + i + '" value="' + escapeHtml(item.title) + '" placeholder="Project title">' +
+        '<button type="button" class="row-remove-btn" data-remove-i="' + i + '" aria-label="Remove">×</button>' +
+      '</div><textarea class="field-textarea" data-row-field="note" data-i="' + i + '" placeholder="Description">' +
+      escapeHtml(item.note) + '</textarea></div>'
+    ).join('') +
+    '<button type="button" class="add-row-btn" id="projects-add-row">+ Add project</button>';
+  wireSimpleFields(body, DRAFT.projects);
+  wireItemFields(body, DRAFT.projects.items, () => renderProjects(true));
+  body.querySelector('#projects-add-row').addEventListener('click', () => {
+    DRAFT.projects.items.push({ status: 'planning', title: '', note: '' });
+    renderProjects(true);
+  });
+}
+
+function renderAllSections(editing){
+  renderAssignments(editing);
+  renderReading(editing);
+  renderSkills(editing);
+  renderProjects(editing);
+}
+
+async function fetchContent(){
+  try {
+    const r = await fetch('/api/content', { cache: 'no-store' });
+    CONTENT = await r.json();
+  } catch (err) {
+    CONTENT = CONTENT || { assignments: { tag: '', rows: [] }, reading: { tag: '', reference: '', title: '', verse: '', question: '' }, skills: { tag: '', items: [] }, projects: { tag: '', items: [] } };
+  }
+  renderAllSections(false);
+}
+
+function enterEditMode(){
+  DRAFT = JSON.parse(JSON.stringify(CONTENT));
+  EDIT_MODE = true;
+  document.getElementById('edit-fab').hidden = true;
+  document.getElementById('edit-bar').hidden = false;
+  document.body.classList.add('editing');
+  renderAllSections(true);
+}
+
+function exitEditMode(){
+  EDIT_MODE = false;
+  DRAFT = null;
+  EDIT_CODE_VALUE = null;
+  document.getElementById('edit-bar').hidden = true;
+  document.getElementById('edit-fab').hidden = false;
+  document.body.classList.remove('editing');
+  renderAllSections(false);
+}
+
+document.getElementById('edit-fab').addEventListener('click', () => {
+  document.getElementById('edit-code-input').value = '';
+  document.getElementById('edit-code-error').hidden = true;
+  document.getElementById('edit-code-overlay').hidden = false;
+  document.getElementById('edit-code-input').focus();
+});
+document.getElementById('edit-code-close').addEventListener('click', () => {
+  document.getElementById('edit-code-overlay').hidden = true;
+});
+document.getElementById('edit-code-overlay').addEventListener('click', ev => {
+  if (ev.target.id === 'edit-code-overlay') document.getElementById('edit-code-overlay').hidden = true;
+});
+document.getElementById('edit-code-form').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const code = document.getElementById('edit-code-input').value;
+  const submitBtn = document.querySelector('.edit-code-submit');
+  submitBtn.disabled = true;
+  try {
+    const r = await fetch('/api/content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    const result = await r.json();
+    if (result.ok){
+      EDIT_CODE_VALUE = code;
+      document.getElementById('edit-code-overlay').hidden = true;
+      enterEditMode();
+    } else {
+      document.getElementById('edit-code-error').hidden = false;
+    }
+  } catch (err) {
+    document.getElementById('edit-code-error').hidden = false;
+  }
+  submitBtn.disabled = false;
+});
+
+document.getElementById('edit-cancel-btn').addEventListener('click', exitEditMode);
+
+document.getElementById('edit-save-btn').addEventListener('click', async () => {
+  const saveBtn = document.getElementById('edit-save-btn');
+  const statusEl = document.getElementById('edit-bar-status');
+  const prevStatus = statusEl.textContent;
+  saveBtn.disabled = true;
+  statusEl.textContent = 'Saving…';
+  try {
+    const r = await fetch('/api/content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: EDIT_CODE_VALUE, content: DRAFT })
+    });
+    const result = await r.json();
+    if (result.ok){
+      await fetchContent();
+      EDIT_MODE = false;
+      DRAFT = null;
+      EDIT_CODE_VALUE = null;
+      document.getElementById('edit-bar').hidden = true;
+      document.getElementById('edit-fab').hidden = false;
+      document.body.classList.remove('editing');
+      statusEl.textContent = prevStatus;
+      saveBtn.disabled = false;
+      return;
+    }
+    statusEl.textContent = 'Save failed — ' + (result.error || 'incorrect code') + '. Your edits are still here.';
+  } catch (err) {
+    statusEl.textContent = 'Save failed — network error. Your edits are still here.';
+  }
+  saveBtn.disabled = false;
+});
+
+fetchContent();
 
 fetch('events.json', {cache:'no-store'})
   .then(r => r.json())
