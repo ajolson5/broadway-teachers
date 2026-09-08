@@ -879,10 +879,13 @@ async function loadEvents(){
   const syncBtn = document.getElementById('sync-events-btn');
   if (syncBtn){ syncBtn.disabled = true; syncBtn.textContent = 'Syncing…'; }
   try {
-    const r = await fetch('events.json', { cache: 'no-store' });
+    const r = await fetch('/api/events', { cache: 'no-store' });
     const data = await r.json();
-    document.getElementById('synced-tag').textContent = 'Synced ' +
-      new Date(data.syncedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    if (!r.ok) throw new Error(data.error || 'Sync failed');
+    const syncedLabel = new Date(data.syncedAt).toLocaleString('en-US', {
+      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+    });
+    document.getElementById('synced-tag').textContent = 'Synced ' + syncedLabel + (data.live === false ? ' (cached)' : '');
     ALL_EVENTS = (data.events || []).map(e => ({ ...e, startDate: new Date(e.start), endDate: e.end ? new Date(e.end) : null }));
     renderEvents(data.events || []);
   } catch (err) {
