@@ -388,9 +388,18 @@ function directionsUrl(destination){
     '&destination=' + encodeURIComponent(destination);
 }
 
+function displayLocation(location){
+  if (!location) return location;
+  const normalized = location.toLowerCase();
+  if (normalized.includes('2235 kingston') && normalized.includes('grand junction')){
+    return 'Church Building, ' + location;
+  }
+  return location;
+}
+
 function locationLineHtml(location){
   if (!location) return '';
-  return '<div class="location-line"><span class="loc-label">Location: </span>' + escapeHtml(location) +
+  return '<div class="location-line"><span class="loc-label">Location: </span>' + escapeHtml(displayLocation(location)) +
     ' <a href="' + mapsSearchUrl(location) + '" target="_blank" rel="noopener" class="maps-link">Open in Maps</a></div>';
 }
 
@@ -526,7 +535,7 @@ function openDetailPopup(eventId){
   const locEl = document.getElementById('detail-popup-location');
   const mapEl = document.getElementById('detail-popup-map');
   if (e.location){
-    locEl.innerHTML = '<span class="loc-label">Location: </span>' + escapeHtml(e.location) +
+    locEl.innerHTML = '<span class="loc-label">Location: </span>' + escapeHtml(displayLocation(e.location)) +
       ' <a href="' + mapsSearchUrl(e.location) + '" target="_blank" rel="noopener" class="maps-link">Open in Maps</a>' +
       ' <a href="' + directionsUrl(e.location) + '" target="_blank" rel="noopener" class="directions-link">Get Directions</a>';
     locEl.hidden = false;
