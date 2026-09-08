@@ -102,6 +102,12 @@ h1,h2,h3{ font-family:'Archivo', system-ui, sans-serif; text-wrap:balance; font-
 .reading-item-title a{ color:var(--teal); text-decoration:none; }
 .reading-item-title a:hover, .reading-item-title a:focus-visible{ text-decoration:underline; }
 .reading-item-note{ color:var(--ink-soft); font-size:.86rem; margin-top:.25rem; white-space:pre-wrap; }
+.challenges-list{ margin:0; padding-left:1.2rem; display:flex; flex-direction:column; gap:.65rem; }
+.challenges-list li{ color:var(--ink-soft); font-size:.9rem; line-height:1.5; padding-left:.15rem; }
+.challenges-list li::marker{ color:var(--teal); font-weight:700; }
+.challenge-edit{ border:1px solid var(--line); border-radius:6px; padding:.5rem; margin-bottom:.5rem; }
+.challenge-edit-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem; }
+.challenge-edit-head .field-label{ margin:0; }
 table.roster{ width:100%; border-collapse:collapse; font-size:.9rem; }
 table.roster th{ text-align:left; font-family:'IBM Plex Mono', monospace; font-size:.66rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:500; padding:0 .5rem .5rem 0; border-bottom:1px solid var(--line); }
 table.roster td{ padding:.55rem .5rem .55rem 0; border-bottom:1px solid var(--line); vertical-align:top; }
@@ -294,6 +300,11 @@ table.roster-edit input{ width:100%; }
       <div class="panel">
         <div class="panel-head"><h2>This Week's Reading</h2><span class="panel-tag" id="reading-tag">—</span></div>
         <div id="reading-body"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Challenges</h2><span class="panel-tag" id="challenges-tag">—</span></div>
+        <div id="challenges-body"></div>
       </div>
 
       <div class="panel">
@@ -821,6 +832,37 @@ function renderReading(editing){
   });
 }
 
+function renderChallenges(editing){
+  const data = editing ? DRAFT.challenges : CONTENT.challenges;
+  document.getElementById('challenges-tag').textContent = data.tag;
+  const body = document.getElementById('challenges-body');
+  if (!editing){
+    if (!data.items.length){
+      body.innerHTML = '<p class="empty">Nothing assigned yet.</p>';
+      return;
+    }
+    body.innerHTML = '<ol class="challenges-list">' +
+      data.items.map(item => '<li>' + escapeHtml(item.text) + '</li>').join('') +
+      '</ol>';
+    return;
+  }
+  body.innerHTML = fieldHtml('Section label', 'tag', data.tag) +
+    data.items.map((item, i) =>
+      '<div class="challenge-edit"><div class="challenge-edit-head">' +
+        '<span class="field-label">Challenge ' + (i + 1) + '</span>' +
+        '<button type="button" class="row-remove-btn" data-remove-i="' + i + '" aria-label="Remove">×</button>' +
+      '</div>' +
+      '<textarea class="field-textarea" data-row-field="text" data-i="' + i + '" placeholder="Challenge text">' + escapeHtml(item.text) + '</textarea></div>'
+    ).join('') +
+    '<button type="button" class="add-row-btn" id="challenges-add-row">+ Add challenge</button>';
+  wireSimpleFields(body, DRAFT.challenges);
+  wireItemFields(body, DRAFT.challenges.items, () => renderChallenges(true));
+  body.querySelector('#challenges-add-row').addEventListener('click', () => {
+    DRAFT.challenges.items.push({ text: '' });
+    renderChallenges(true);
+  });
+}
+
 const SKILL_STATUS_MARK = { done: '✓', doing: '◐', todo: '○' };
 
 function renderSkills(editing){
@@ -909,6 +951,7 @@ function renderProjects(editing){
 function renderAllSections(editing){
   renderAssignments(editing);
   renderReading(editing);
+  renderChallenges(editing);
   renderSkills(editing);
   renderProjects(editing);
 }
@@ -918,7 +961,7 @@ async function fetchContent(){
     const r = await fetch('/api/content', { cache: 'no-store' });
     CONTENT = await r.json();
   } catch (err) {
-    CONTENT = CONTENT || { assignments: { tag: '', rows: [] }, reading: { tag: '', items: [] }, skills: { tag: '', items: [] }, projects: { tag: '', items: [] } };
+    CONTENT = CONTENT || { assignments: { tag: '', rows: [] }, reading: { tag: '', items: [] }, challenges: { tag: '', items: [] }, skills: { tag: '', items: [] }, projects: { tag: '', items: [] } };
   }
   renderAllSections(false);
 }

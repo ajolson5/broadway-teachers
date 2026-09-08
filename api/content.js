@@ -29,6 +29,15 @@ const DEFAULT_CONTENT = {
       }
     ]
   },
+  challenges: {
+    tag: 'This Week',
+    items: [
+      { text: 'Work with your parents to find and study your line of authority. Maybe consider printing it out for safe keeping.' },
+      { text: 'Have your parents order the free FSY magazine subscription or locate it on phone to be able to study during the week.' },
+      { text: 'Bring your FSY guide and FSY magazine (for the current month) to church, or bring a device that has access to the Gospel Library App.' },
+      { text: "Complete This Week's Reading to come to class prepared (~30 minutes)." }
+    ]
+  },
   skills: {
     tag: 'Quorum goals',
     items: [
