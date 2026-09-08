@@ -115,6 +115,8 @@ table.roster td.note{ color:var(--muted); font-size:.84rem; }
 .skill.done .mark{ background:var(--teal-soft); color:var(--teal); border:1px solid var(--teal); }
 .skill .body b{ display:block; font-size:.92rem; }
 .skill .body span{ color:var(--muted); font-size:.82rem; }
+.detail-trigger{ display:block; margin-top:.3rem; appearance:none; background:none; border:none; padding:0; font-family:'IBM Plex Sans', sans-serif; font-size:.78rem; font-weight:600; color:var(--teal); cursor:pointer; text-align:left; }
+.detail-trigger:hover, .detail-trigger:focus-visible{ text-decoration:underline; }
 .projects{ display:flex; flex-direction:column; gap:.9rem; }
 .project{ padding:.85rem .95rem; border:1px solid var(--line); border-radius:8px; }
 .project-head{ display:flex; justify-content:space-between; align-items:baseline; gap:.5rem; margin-bottom:.3rem; }
@@ -134,6 +136,9 @@ footer{ margin-top:2.2rem; padding-top:1rem; border-top:1px solid var(--line); f
 .cal-month-label{ font-family:'Archivo', system-ui, sans-serif; font-weight:800; letter-spacing:-.01em; font-size:1.25rem; min-width:12ch; text-align:center; }
 .cal-nav, .cal-close{ appearance:none; background:var(--paper); border:1px solid var(--line); color:var(--ink); width:2.2rem; height:2.2rem; border-radius:6px; font-size:1.1rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .cal-nav:hover, .cal-close:hover{ border-color:var(--teal); color:var(--teal); }
+.cal-links{ display:flex; flex-direction:column; gap:.3rem; padding:.65rem 1.1rem; border-bottom:1px solid var(--line); flex:0 0 auto; }
+.cal-links a{ font-size:.76rem; color:var(--teal); text-decoration:none; }
+.cal-links a:hover, .cal-links a:focus-visible{ text-decoration:underline; }
 .cal-body{ overflow-y:auto; padding:1rem 1.3rem; flex:1 1 auto; }
 .cal-weekdays{ display:grid; grid-template-columns:repeat(7,1fr); gap:.5rem; font-family:'IBM Plex Mono', monospace; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); text-align:center; margin-bottom:.5rem; }
 .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:.5rem; }
@@ -220,6 +225,21 @@ table.roster-edit input{ width:100%; }
 .skill-edit-head, .project-edit-head{ display:flex; gap:.5rem; align-items:center; margin-bottom:.45rem; }
 .skill-edit-head select, .project-edit-head select{ font-family:'IBM Plex Mono', monospace; font-size:.72rem; border:1px solid var(--line); border-radius:6px; padding:.3rem .4rem; background:var(--paper); color:var(--ink); }
 .skill-edit-head .field-input, .project-edit-head .field-input{ flex:1 1 auto; }
+
+.subitems-box{ margin-top:.55rem; padding:.6rem; border:1px dashed var(--line); border-radius:6px; background:var(--paper); }
+.subitems-label{ display:block; font-family:'IBM Plex Mono', monospace; font-size:.62rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:.5rem; }
+.subitem-edit{ border:1px solid var(--line); border-radius:6px; padding:.5rem; margin-bottom:.5rem; background:var(--paper-raised); }
+.subitem-edit:last-of-type{ margin-bottom:.6rem; }
+.subitem-edit-head{ display:flex; gap:.5rem; align-items:center; margin-bottom:.4rem; }
+.subitem-edit-head .field-input{ flex:1 1 auto; }
+.subitem-edit .field-input + .field-input{ margin-top:.4rem; }
+
+.item-detail-overlay{ position:fixed; inset:0; background:var(--overlay); display:flex; align-items:center; justify-content:center; padding:1.25rem; z-index:130; }
+.item-detail-overlay[hidden]{ display:none; }
+.item-detail-modal{ background:var(--paper-raised); border-radius:10px; box-shadow:var(--shadow); width:100%; max-width:480px; max-height:80vh; overflow-y:auto; padding:1.1rem 1.2rem 1.3rem; }
+.item-detail-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:.6rem; margin-bottom:.85rem; }
+.item-detail-head h3{ font-size:1.1rem; }
+.item-detail-list{ display:flex; flex-direction:column; gap:.75rem; }
 </style>
 </head>
 <body>
@@ -237,7 +257,7 @@ table.roster-edit input{ width:100%; }
   </div>
 
   <div class="notice">
-    <span><b>Events sync automatically</b> from the Teachers Quorum Activities Google Calendar. Assignments, skills, and projects below are placeholders — send the real details and this page gets updated to match.</span>
+    <span><b>Events sync automatically</b> from the Teachers Quorum Activities Google Calendar.</span>
   </div>
 
   <div class="board">
@@ -307,6 +327,10 @@ table.roster-edit input{ width:100%; }
       </div>
       <button class="cal-close" id="cal-close" type="button" aria-label="Close calendar">×</button>
     </div>
+    <div class="cal-links">
+      <a href="https://forms.gle/sH8WgZGAwwBWh1MRA" target="_blank" rel="noopener">Click here to add email to become an editor on the calendar</a>
+      <a href="https://calendar.google.com/calendar/embed?src=ba559c074f862e368309e91f5012d9839197c47750e175b174d963b3d87eb288%40group.calendar.google.com&amp;ctz=America%2FDenver" target="_blank" rel="noopener">Click here to add the calendar to yours with view only permissions</a>
+    </div>
     <div class="cal-body">
       <div class="cal-weekdays">
         <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
@@ -353,6 +377,16 @@ table.roster-edit input{ width:100%; }
     <div class="detail-popup-map" id="detail-popup-map" hidden></div>
     <div class="detail-popup-location" id="detail-popup-link" hidden></div>
     <div class="detail-popup-body" id="detail-popup-body"></div>
+  </div>
+</div>
+
+<div class="item-detail-overlay" id="item-detail-overlay" hidden>
+  <div class="item-detail-modal" role="dialog" aria-modal="true" aria-labelledby="item-detail-title">
+    <div class="item-detail-head">
+      <h3 id="item-detail-title">—</h3>
+      <button class="cal-close" id="item-detail-close" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="item-detail-list" id="item-detail-list"></div>
   </div>
 </div>
 
@@ -584,9 +618,14 @@ document.getElementById('detail-close').addEventListener('click', closeDetailPop
 document.getElementById('detail-overlay').addEventListener('click', ev => {
   if (ev.target.id === 'detail-overlay') closeDetailPopup();
 });
+document.getElementById('item-detail-close').addEventListener('click', closeItemDetail);
+document.getElementById('item-detail-overlay').addEventListener('click', ev => {
+  if (ev.target.id === 'item-detail-overlay') closeItemDetail();
+});
 document.addEventListener('keydown', ev => {
   if (ev.key !== 'Escape') return;
   if (!document.getElementById('edit-code-overlay').hidden){ document.getElementById('edit-code-overlay').hidden = true; return; }
+  if (!document.getElementById('item-detail-overlay').hidden){ closeItemDetail(); return; }
   if (!document.getElementById('detail-overlay').hidden){ closeDetailPopup(); return; }
   if (!document.getElementById('cal-overlay').hidden) closeCalendarModal();
 });
@@ -631,6 +670,87 @@ function wireItemFields(container, items, rerender){
       rerender();
     });
   });
+}
+
+function subitemsBoxHtml(item, outerIndex){
+  const subitems = item.subitems || [];
+  return '<div class="subitems-box">' +
+    '<label class="subitems-label">Expandable details (optional)</label>' +
+    '<input class="field-input" data-row-field="detailsLabel" data-i="' + outerIndex + '" value="' +
+      escapeHtml(item.detailsLabel || '') + '" placeholder="Click-to-expand text, e.g. &quot;Click to see knots&quot;" style="margin-bottom:.5rem;">' +
+    subitems.map((si, si_i) =>
+      '<div class="subitem-edit"><div class="subitem-edit-head">' +
+        '<input class="field-input" data-sub-field="title" data-i="' + outerIndex + '" data-si="' + si_i + '" value="' +
+          escapeHtml(si.title) + '" placeholder="Item title">' +
+        '<button type="button" class="row-remove-btn" data-remove-sub-i="' + outerIndex + '" data-remove-sub-si="' + si_i + '" aria-label="Remove item">×</button>' +
+      '</div>' +
+      '<input class="field-input" type="url" data-sub-field="url" data-i="' + outerIndex + '" data-si="' + si_i + '" value="' +
+        escapeHtml(si.url) + '" placeholder="https://...">' +
+      '<input class="field-input" data-sub-field="note" data-i="' + outerIndex + '" data-si="' + si_i + '" value="' +
+        escapeHtml(si.note) + '" placeholder="Note (optional)">' +
+      '</div>'
+    ).join('') +
+    '<button type="button" class="add-row-btn" data-add-sub-i="' + outerIndex + '">+ Add item</button>' +
+  '</div>';
+}
+
+function wireSubitems(container, items, rerender){
+  container.querySelectorAll('[data-sub-field]').forEach(el => {
+    const handler = e => {
+      const i = Number(e.target.getAttribute('data-i'));
+      const si = Number(e.target.getAttribute('data-si'));
+      if (!items[i].subitems) items[i].subitems = [];
+      items[i].subitems[si][e.target.getAttribute('data-sub-field')] = e.target.value;
+    };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+  });
+  container.querySelectorAll('[data-remove-sub-i]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = Number(btn.getAttribute('data-remove-sub-i'));
+      const si = Number(btn.getAttribute('data-remove-sub-si'));
+      items[i].subitems.splice(si, 1);
+      rerender();
+    });
+  });
+  container.querySelectorAll('[data-add-sub-i]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = Number(btn.getAttribute('data-add-sub-i'));
+      if (!items[i].subitems) items[i].subitems = [];
+      items[i].subitems.push({ title: '', url: '', note: '' });
+      rerender();
+    });
+  });
+}
+
+function wireDetailTriggers(container, items){
+  container.querySelectorAll('[data-detail-i]').forEach(el => {
+    el.addEventListener('click', () => {
+      const item = items[Number(el.getAttribute('data-detail-i'))];
+      openItemDetail(item.title, item.subitems || []);
+    });
+  });
+}
+
+function openItemDetail(title, subitems){
+  document.getElementById('item-detail-title').textContent = title;
+  const list = document.getElementById('item-detail-list');
+  if (!subitems.length){
+    list.innerHTML = '<p class="empty">Nothing added yet.</p>';
+  } else {
+    list.innerHTML = subitems.map(si => {
+      const titleHtml = si.url
+        ? '<a href="' + escapeHtml(si.url) + '" target="_blank" rel="noopener">' + escapeHtml(si.title) + '</a>'
+        : escapeHtml(si.title);
+      return '<div class="reading-item"><div class="reading-item-title">' + titleHtml + '</div>' +
+        (si.note ? '<div class="reading-item-note">' + escapeHtml(si.note) + '</div>' : '') + '</div>';
+    }).join('');
+  }
+  document.getElementById('item-detail-overlay').hidden = false;
+}
+
+function closeItemDetail(){
+  document.getElementById('item-detail-overlay').hidden = true;
 }
 
 function renderAssignments(editing){
@@ -708,11 +828,16 @@ function renderSkills(editing){
   document.getElementById('skills-tag').textContent = data.tag;
   const body = document.getElementById('skills-body');
   if (!editing){
-    body.innerHTML = '<div class="skills">' + data.items.map(item => {
+    body.innerHTML = '<div class="skills">' + data.items.map((item, i) => {
       const cls = item.status === 'done' ? ' done' : item.status === 'doing' ? ' doing' : '';
+      const hasSub = item.subitems && item.subitems.length > 0;
+      const trigger = hasSub
+        ? '<button type="button" class="detail-trigger" data-detail-i="' + i + '">' + escapeHtml(item.detailsLabel || 'View details') + '</button>'
+        : '';
       return '<div class="skill' + cls + '"><div class="mark">' + (SKILL_STATUS_MARK[item.status] || '○') +
-        '</div><div class="body"><b>' + escapeHtml(item.title) + '</b><span>' + escapeHtml(item.note) + '</span></div></div>';
+        '</div><div class="body"><b>' + escapeHtml(item.title) + '</b><span>' + escapeHtml(item.note) + '</span>' + trigger + '</div></div>';
     }).join('') + '</div>';
+    wireDetailTriggers(body, data.items);
     return;
   }
   body.innerHTML = fieldHtml('Section label', 'tag', data.tag) +
@@ -725,13 +850,15 @@ function renderSkills(editing){
         '</select>' +
         '<input class="field-input" data-row-field="title" data-i="' + i + '" value="' + escapeHtml(item.title) + '" placeholder="Skill title">' +
         '<button type="button" class="row-remove-btn" data-remove-i="' + i + '" aria-label="Remove">×</button>' +
-      '</div><input class="field-input" data-row-field="note" data-i="' + i + '" value="' + escapeHtml(item.note) + '" placeholder="Note"></div>'
+      '</div><input class="field-input" data-row-field="note" data-i="' + i + '" value="' + escapeHtml(item.note) + '" placeholder="Note">' +
+      subitemsBoxHtml(item, i) + '</div>'
     ).join('') +
     '<button type="button" class="add-row-btn" id="skills-add-row">+ Add skill</button>';
   wireSimpleFields(body, DRAFT.skills);
   wireItemFields(body, DRAFT.skills.items, () => renderSkills(true));
+  wireSubitems(body, DRAFT.skills.items, () => renderSkills(true));
   body.querySelector('#skills-add-row').addEventListener('click', () => {
-    DRAFT.skills.items.push({ status: 'todo', title: '', note: '' });
+    DRAFT.skills.items.push({ status: 'todo', title: '', note: '', detailsLabel: '', subitems: [] });
     renderSkills(true);
   });
 }
@@ -743,11 +870,16 @@ function renderProjects(editing){
   document.getElementById('projects-tag').textContent = data.tag;
   const body = document.getElementById('projects-body');
   if (!editing){
-    body.innerHTML = '<div class="projects">' + data.items.map(item =>
-      '<div class="project"><div class="project-head"><h3>' + escapeHtml(item.title) + '</h3><span class="pill ' +
+    body.innerHTML = '<div class="projects">' + data.items.map((item, i) => {
+      const hasSub = item.subitems && item.subitems.length > 0;
+      const trigger = hasSub
+        ? '<button type="button" class="detail-trigger" data-detail-i="' + i + '">' + escapeHtml(item.detailsLabel || 'View details') + '</button>'
+        : '';
+      return '<div class="project"><div class="project-head"><h3>' + escapeHtml(item.title) + '</h3><span class="pill ' +
       item.status + '">' + escapeHtml(PROJECT_STATUS_LABEL[item.status] || item.status) + '</span></div><p>' +
-      escapeHtml(item.note) + '</p></div>'
-    ).join('') + '</div>';
+      escapeHtml(item.note) + '</p>' + trigger + '</div>';
+    }).join('') + '</div>';
+    wireDetailTriggers(body, data.items);
     return;
   }
   body.innerHTML = fieldHtml('Section label', 'tag', data.tag) +
@@ -761,13 +893,15 @@ function renderProjects(editing){
         '<input class="field-input" data-row-field="title" data-i="' + i + '" value="' + escapeHtml(item.title) + '" placeholder="Project title">' +
         '<button type="button" class="row-remove-btn" data-remove-i="' + i + '" aria-label="Remove">×</button>' +
       '</div><textarea class="field-textarea" data-row-field="note" data-i="' + i + '" placeholder="Description">' +
-      escapeHtml(item.note) + '</textarea></div>'
+      escapeHtml(item.note) + '</textarea>' +
+      subitemsBoxHtml(item, i) + '</div>'
     ).join('') +
     '<button type="button" class="add-row-btn" id="projects-add-row">+ Add project</button>';
   wireSimpleFields(body, DRAFT.projects);
   wireItemFields(body, DRAFT.projects.items, () => renderProjects(true));
+  wireSubitems(body, DRAFT.projects.items, () => renderProjects(true));
   body.querySelector('#projects-add-row').addEventListener('click', () => {
-    DRAFT.projects.items.push({ status: 'planning', title: '', note: '' });
+    DRAFT.projects.items.push({ status: 'planning', title: '', note: '', detailsLabel: '', subitems: [] });
     renderProjects(true);
   });
 }
